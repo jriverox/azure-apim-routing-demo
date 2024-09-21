@@ -8,7 +8,9 @@ Esta es una demostración sobre cómo crear un Azure Api Management con una pol�
 
 Asegúrate de desplegar la API demo desde este repositorio, que expone un endpoint POST api/messages con el payload que tiene la estructura que configuraremos en la política de enrutamiento de Azure API Management.
 
-## Desplegar en Azure
+Tambien dejo mas abajo las instrucciones para desplegarlo en Azure Container Apps o GCP Cloud Run.
+
+## Desplegar API en Azure Container Apps
 
 1. Iniciar sesión en Azure CLI (si no lo has hecho aún):
 
@@ -68,7 +70,7 @@ az containerapp create \
 
 *Nota*: La opción --query configuration.ingress.fqdn devolverá la URL de acceso público del API
 
-## Eliminar los recursos creados en Azure
+## Eliminar los recursos creados en Azure Container Apps
 
 ```bash
 az group delete --name messenger-resource-group --yes --no-wait
@@ -76,7 +78,7 @@ az group delete --name messenger-resource-group --yes --no-wait
 
 Esto eliminará el grupo de recursos y todos los recursos asociados, incluidos el ACR, la aplicación en Azure Container Apps, y cualquier otro recurso creado dentro de ese grupo.
 
-## Despliegue en GCP Cloud Run
+## Despliegue API en GCP Cloud Run
 
 1. Optional, configura tu cuenta GCP
 
@@ -169,7 +171,7 @@ gcloud run services describe messenger-simulator --platform managed --region us-
 
 ```
 
-## Eliminar recursos creados de GCP
+## Eliminar recursos de API creados de GCP Cloud Run
 
 1. Eliminar el Servicio
     Primero lista las imágenes en tu proyecto para identificar la imagen que quieres eliminar:
