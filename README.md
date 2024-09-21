@@ -8,7 +8,75 @@ Esta es una demostración sobre cómo crear un Azure Api Management con una pol�
 
 Asegúrate de desplegar la API demo desde este repositorio, que expone un endpoint POST api/messages con el payload que tiene la estructura que configuraremos en la política de enrutamiento de Azure API Management.
 
-### Despliegue en GCP
+## Desplegar en Azure
+
+1. Iniciar sesión en Azure CLI (si no lo has hecho aún):
+
+```bash
+az login
+```
+
+2. Opcional: Crear un Resource Group (esto para aislar los recursos del demo)
+
+```bash
+az group create --name messenger-resource-group --location eastus
+```
+
+3. Crear un Azure Container Registry (ACR)
+
+```bash
+az acr create --resource-group messenger-resource-group --name jrxcontainerregistry --sku Basic --admin-enabled true
+```
+
+4. Autenticarse en el Azure Container Registry (ACR)
+
+```bash
+az acr login --name jrxcontainerregistry
+```
+
+5. Construir y etiquetar la imagen de Docker (en mi caso uso --platform linux/amd64 porque estoy generando desde un mac con m1)
+
+```bash
+docker build --platform linux/amd64 -t jrxcontainerregistry.azurecr.io/messenger-simulator .
+```
+
+6. Subir la imagen a ACR
+
+```bash
+docker push jrxcontainerregistry.azurecr.io/messenger-simulator
+```
+
+7. Crear un entorno de Azure Container Apps
+
+```bash
+az containerapp env create --name messengerEnv --resource-group messenger-resource-group --location eastus
+```
+
+8. Desplegar la aplicación en Azure Container Apps
+
+```bash
+az containerapp create \
+  --name messenger-simulator-app \
+  --resource-group messenger-resource-group \
+  --environment messengerEnv \
+  --image jrxcontainerregistry.azurecr.io/messenger-simulator \
+  --target-port 8080 \
+  --ingress 'external' \
+  --registry-server jrxcontainerregistry.azurecr.io \
+  --query configuration.ingress.fqdn
+  ```
+
+*Nota*: La opción --query configuration.ingress.fqdn devolverá la URL de acceso público del API
+
+## Eliminar los recursos creados en Azure
+
+```bash
+az group delete --name messenger-resource-group --yes --no-wait
+```
+
+Esto eliminará el grupo de recursos y todos los recursos asociados, incluidos el ACR, la aplicación en Azure Container Apps, y cualquier otro recurso creado dentro de ese grupo.
+
+## Despliegue en GCP Cloud Run
 
 1. Optional, configura tu cuenta GCP
 
@@ -101,7 +169,7 @@ gcloud run services describe messenger-simulator --platform managed --region us-
 
 ```
 
-### Eliminar recursos creados de GCP
+## Eliminar recursos creados de GCP
 
 1. Eliminar el Servicio
     Primero lista las imágenes en tu proyecto para identificar la imagen que quieres eliminar:
