@@ -10,31 +10,31 @@ Asegúrate de desplegar la API demo desde este repositorio, que expone un endpoi
 
 ### Despliegue en GCP
 
-1; Optional, configura tu cuenta GCP
+1. Optional, configura tu cuenta GCP
 
 ```bash
 gcloud config set account [ACCOUNT]
 ```
 
-2; Optional, configura el proyecto en GCP que vas a usar.
+2. Optional, configura el proyecto en GCP que vas a usar.
 
 ```bash
 gcloud config set project [PROJECT-ID]
 ```
 
-3; Autenticarte en GCP y configurar Docker para usar GCR
+3. Autenticarte en GCP y configurar Docker para usar GCR
 
 ```bash
 gcloud auth configure-docker
 ```
 
-4; Construye y sube la imagen a GCR.
+4. Construye y sube la imagen a GCR.
 
 ```bash
 gcloud builds submit --tag gcr.io/[PROJECT-ID]/messenger-simulator
 ```
 
-5; Para desplegar la imagen en Cloud Run, usa el siguiente comando:
+5. Para desplegar la imagen en Cloud Run, usa el siguiente comando:
 
 ```bash
 gcloud run deploy messenger-simulator \
@@ -46,7 +46,7 @@ gcloud run deploy messenger-simulator \
 
 Si todo salió bien copia la URL de tu Cloud Run desde el campo Service URL que generó el comando anterior.
 
-6; Probar la API desplegada
+6. Probar la API desplegada
 
 ```bash
 curl --location '[SERVICE-URL]/api/messages' \
@@ -94,7 +94,7 @@ curl --location '[SERVICE-URL]/api/messages' \
 }'
 ```
 
-7; Tambien puedes ejecutar este comando para obtener la URL del Servicio desplegado:
+7. Tambien puedes ejecutar este comando para obtener la URL del Servicio desplegado:
 
 ```bash
 gcloud run services describe messenger-simulator --platform managed --region us-central1 --format 'value(status.url)'
@@ -103,14 +103,14 @@ gcloud run services describe messenger-simulator --platform managed --region us-
 
 ### Eliminar recursos creados de GCP
 
-1; Eliminar el Servicio
+1. Eliminar el Servicio
     Primero lista las imágenes en tu proyecto para identificar la imagen que quieres eliminar:
 
 ```bash
 gcloud run services delete messenger-simulator --platform managed --region us-central1
 ```
 
-2; Eliminar la imagen de Google Container Registry
+2. Eliminar la imagen de Google Container Registry
 
 ```bash
 gcloud container images list --repository=gcr.io/[PROJECT-ID]
