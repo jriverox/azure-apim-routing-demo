@@ -1,0 +1,32 @@
+{
+  "name": "azure-apim-routing-demo",
+  "version": "1.0.0",
+  "description": "This is a demonstration about how to create an Azure Api Management (API Gateway) with a Routing policy that routes to a different target URL based on a field in the request body",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jriverox/azure-apim-routing-demo.git"
+  },
+  "keywords": [
+    "azure",
+    "apim",
+    "api-management",
+    "api-gateway",
+    "routing-policy",
+    "nodejs"
+  ],
+  "author": "Jhony Rivero",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jriverox/azure-apim-routing-demo/issues"
+  },
+  "homepage": "https://github.com/jriverox/azure-apim-routing-demo#readme",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "express": "^4.21.0"
+  }
+}

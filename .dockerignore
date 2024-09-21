@@ -1,0 +1,28 @@
+# Ignorar node_modules ya que se instalará dentro del contenedor
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Ignorar archivos de entorno
+.env
+
+# Ignorar archivos de test y coverage
+coverage
+test
+tests
+
+# Ignorar logs
+logs
+*.log
+
+# Ignorar archivos de configuración locales
+*.local
+
+# Ignorar carpetas de compilación o distribución (si aplica)
+dist
+build
+
+# Ignorar archivos de Docker y Docker Compose (si los usas)
+Dockerfile
+docker-compose.yml
