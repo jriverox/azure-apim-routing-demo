@@ -1,16 +1,20 @@
-# azure-apim-routing-demo
+# Demo de uso de Enrutamiento usando politicas de enrutamiento en Azure API Management (API Gateway)
 
 Azure API Mnagement es el API Gateway de Azure.
 
-Esta es una demostración sobre cómo crear un Azure Api Management con una política de enrutamiento (routing policy) que enruta a una URL destino diferente en función de un campo en el body del request http.
+Esta es una demostración sobre cómo crear un Azure Api Management con una política de enrutamiento (routing policy) a URLs distintas en función de un campo en el body del request http.
 
-## Antes de Configurar el Azure API Management
+En este demo se despliega una API muy basico desarrollado en Express.js y para exponerlo como 2 servicios distintos uno en Azure Container Apps y otro en GCP Cloud Run.
 
-Asegúrate de desplegar la API demo desde este repositorio, que expone un endpoint POST api/messages con el payload que tiene la estructura que configuraremos en la política de enrutamiento de Azure API Management.
+El objetivo de tener un Api Gateway en esta demo es que se puedan configurar enrutamientos al backend 1 o al backend 2 dependiendo si el parametro phone_number_id de Body tiene el valor de "1111" o "2222".
 
-Tambien dejo mas abajo las instrucciones para desplegarlo en Azure Container Apps o GCP Cloud Run.
+Aunque se vea muy simple la implementación del código, este repo se ha creado con fines puramete de aprendizaje en mi camino por conocer soluciones de diferentes proveedores de Cloud.
 
-## Desplegar API en Azure Container Apps
+## Despliegar la API de ejemplo
+
+En las 2 siguientes secciones encontraás las instrucciones para desplegar el código de node.js y exponer la misma API tanto en GCP como en Azure.
+
+### Desplegar la API en Azure Container Apps
 
 1. Iniciar sesión en Azure CLI (si no lo has hecho aún):
 
@@ -70,7 +74,7 @@ az containerapp create \
 
 *Nota*: La opción --query configuration.ingress.fqdn devolverá la URL de acceso público del API
 
-## Eliminar los recursos creados en Azure Container Apps
+### Eliminar los recursos creados en Azure Container Apps
 
 ```bash
 az group delete --name messenger-resource-group --yes --no-wait
@@ -78,7 +82,7 @@ az group delete --name messenger-resource-group --yes --no-wait
 
 Esto eliminará el grupo de recursos y todos los recursos asociados, incluidos el ACR, la aplicación en Azure Container Apps, y cualquier otro recurso creado dentro de ese grupo.
 
-## Despliegue API en GCP Cloud Run
+### Despliegue API en GCP Cloud Run
 
 1. Optional, configura tu cuenta GCP
 
@@ -171,7 +175,7 @@ gcloud run services describe messenger-simulator --platform managed --region us-
 
 ```
 
-## Eliminar recursos de API creados de GCP Cloud Run
+### Eliminar recursos de API creados de GCP Cloud Run
 
 1. Eliminar el Servicio
     Primero lista las imágenes en tu proyecto para identificar la imagen que quieres eliminar:
@@ -191,3 +195,45 @@ Eliminar la imagen
 ```bash
 gcloud container images delete gcr.io/[PROJECT-ID]/messenger-simulator --force-delete-tags
 ```
+
+## Configuración de Azure API Management (API Gateway)
+
+1. Crear Grupo de Recursos en caso que no lo hayas creado al desplegar el Api en Azure Container Apps (seccion Desplegar la API en Azure Container Apps)
+
+```bash
+az group create --name messenger-resource-group --location eastus
+```
+
+2. Crear una instancia de Azure API Management
+
+```bash
+az apim create --name messengerApiGateway --resource-group messenger-resource-group --publisher-name MyCompany --publisher-email admin@mycompany.com --sku-name Consumption
+```
+
+3. Crear una API en API Management
+
+```bash
+az apim api create --resource-group messenger-resource-group --service-name messengerApiGateway --api-id webhook-api --path api --display-name "Webhook API" --protocols https
+```
+
+4. Crear una operación POST en la API
+
+```bash
+az apim api operation create --resource-group messenger-resource-group --service-name messengerApiGateway --api-id webhook-api --operation-id post-webhook --display-name "Post Webhook" --method POST --url-template /messages
+```
+
+### Configurar la politica de enrutamiento
+
+Por alguna razón que no entiendo, el CLI de Azure (az apim) no tiene nunguna opción para crear y aplicar una politica de enrutamiento. Por esta razón, la crearemos desde la consola de Azure.
+
+1. Navega hast la [consola de Azure](https://portal.azure.com/#home)
+2. Selecciona la opción de Resource Groups y selecciona el que creamos en pasos anteriores (messenger-resource-group)
+3. En la lista de recursos, selecciona messengerApiGateway.
+4. En el menú izquierdo selecciona la opcion APIs.
+5. Selecciona la api que creamos en pasos anteriores (Webhook API)
+6. En la sección All Operations, selecciona Post Messages.
+7. En la sección Inbound processing has clic en el botón **base**
+8. Edita el contenido del archivo routing-policy.xml que encontrarás en el cpodigo fuente del repositorio. Dentro del elemnto **choose/when** del XML cambia los valores del atributo *base-url* del elemnto **set-backend-service**. Asegurate de tener a la mano las URLs de los 2 servicios que desplegaste en las secciones de despliegue del API en Azure Container Apps y en GCP Cloud Run. Deberas reemplazar el URL basse de cada uno de los valores para cada de base-url de cada set-backend-service. Por ejmplo: el URL del servicio desplegado en Azure Container Apps debe lucir como [https://messenger-simulator-app.greenbay-59055aea.eastus.azurecontainerapps.io/api], recuerda que solo debes reemplzar el URL base dejando /api.
+9. Ahora has clic en el botón **Save**.
+10. Si quieres probar o incluso hacer un debug puedes seleccionar la opción **Test** del menú superior, busca la sección Request body y pega el body (puedes apoyarte en el archivo payload-sample.json donde encontrarás un ejemplo del request).
+11. Pega ese json en el campo Request body y has clic en el botón Send (o Trace). Una vez que termine la ejecución puedes bajar hasta el final de esa sección y revisar el resultado. Tambien puedes probar usando curl o Postman. Para encontrar el URL de tu API en API Management, puedes hacer clic en la opción Overview del menú izquierdo y copiar el valor de Gateway URL.

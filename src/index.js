@@ -22,6 +22,8 @@ app.get('/api/health', (req, res) => {
 });
 
 app.post('/api/messages', (req, res) => {
+    const { body } = req
+    console.log(JSON.stringify(body));
     const baseURL = getBaseURL(req);
     console.log(`Health check, base URL: ${baseURL}`);
     // Extraer el phone_number_id del payload
