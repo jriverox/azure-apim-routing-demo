@@ -10,7 +10,7 @@ El objetivo de tener un Api Gateway en esta demo es que se puedan configurar enr
 
 Aunque se vea muy simple la implementación del código, este repo se ha creado con fines puramete de aprendizaje en mi camino por conocer soluciones de diferentes proveedores de Cloud.
 
-## Despliegar la API de ejemplo
+## Desplegar la API de ejemplo
 
 En las 2 siguientes secciones encontraás las instrucciones para desplegar el código de node.js y exponer la misma API tanto en GCP como en Azure.
 
